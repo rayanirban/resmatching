@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.56">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>interactive_crop_viewer_fast</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="interactive_crop_viewer_fast_files/libs/clipboard/clipboard.min.js"></script>
+<script src="interactive_crop_viewer_fast_files/libs/quarto-html/quarto.js"></script>
+<script src="interactive_crop_viewer_fast_files/libs/quarto-html/popper.min.js"></script>
+<script src="interactive_crop_viewer_fast_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="interactive_crop_viewer_fast_files/libs/quarto-html/anchor.min.js"></script>
+<link href="interactive_crop_viewer_fast_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="interactive_crop_viewer_fast_files/libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="interactive_crop_viewer_fast_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="interactive_crop_viewer_fast_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="interactive_crop_viewer_fast_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-full">
+
+<main class="content column-page" id="quarto-document-content">
+
+
+
+
+<div id="5b5e585a" class="cell" data-message="false" data-execution_count="1">
+
+<style>
+    :root {
+        --bg-primary: #0a0a0a;
+        --bg-secondary: #1a1a1a;
+        --bg-tertiary: #222222;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --accent-primary: #4A9EFF;
+        --accent-hover: #5BA8FF;
+        --border-color: #2a2a2a;
+        --border-hover: #3a3a3a;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+        --glow-color: rgba(74, 158, 255, 0.2);
+        --font-graphik: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html {
+        font-size: 95%;
+        scroll-padding-top: 90px;
+    }
+
+    body {
+        font-family: var(--font-graphik);
+        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        color: var(--text-primary);
+        line-height: 1.6;
+        min-height: 100vh;
+        font-size: 1rem;
+    }
+
+    /* Header Styles */
+    .paper-header {
+        max-width: 1200px;
+        margin: 0 auto 40px;
+        padding: 40px 20px;
+        text-align: center;
+    }
+
+    .paper-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--text-primary);
+        margin-bottom: 30px;
+        line-height: 1.2;
+    }
+
+    .authors {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        color: var(--text-primary);
+    }
+
+    .author-link {
+        color: var(--accent-primary);
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .author-link:hover {
+        color: var(--accent-hover);
+        text-decoration: none;
+    }
+
+    .affiliations {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        margin-bottom: 25px;
+        font-style: italic;
+    }
+
+    .paper-links {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+    }
+
+    .paper-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: var(--bg-tertiary);
+        color: var(--accent-primary);
+        text-decoration: none;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .paper-link:hover {
+        background: var(--bg-secondary);
+        border-color: var(--accent-primary);
+        color: var(--accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px var(--glow-color);
+    }
+
+    .paper-summary {
+        max-width: 900px;
+        margin: 0 auto 40px;
+        padding: 30px;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        text-align: left;
+        line-height: 1.8;
+    }
+
+    .paper-summary h3 {
+        color: var(--text-primary);
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .paper-summary p {
+        color: var(--text-primary);
+        margin-bottom: 15px;
+    }
+
+    .results-section {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .results-section h2 {
+        color: var(--text-primary);
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .results-placeholder {
+        background: var(--bg-secondary);
+        border: 1px dashed var(--border-color);
+        border-radius: 8px;
+        padding: 60px 20px;
+        text-align: center;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+    }
+
+    .citation-section {
+        max-width: 900px;
+        margin: 60px auto 40px;
+        padding: 30px;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+    }
+
+    .citation-section h2 {
+        color: var(--text-primary);
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+
+    .citation-box {
+        background: var(--bg-primary);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        overflow-x: auto;
+        position: relative;
+    }
+
+    .copy-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        background: var(--accent-primary);
+        color: var(--bg-primary);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.85rem;
+        transition: all 0.3s;
+    }
+
+    .copy-button:hover {
+        background: var(--accent-hover);
+        transform: scale(1.05);
+    }
+
+    .copy-button:active {
+        transform: scale(0.95);
+    }
+
+    .interactive-section {
+        max-width: 1400px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .section-divider {
+        max-width: 1200px;
+        margin: 60px auto;
+        border-top: 2px solid var(--border-color);
+    }
+
+    .controls {
+        background: var(--bg-secondary);
+        padding: 15px 20px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 8px var(--shadow-color);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    .control-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .control-label {
+        font-weight: bold;
+        color: var(--text-primary);
+        font-size: 13px;
+        white-space: nowrap;
+    }
+    .slider-value {
+        color: var(--accent-primary);
+        font-weight: 600;
+        font-size: 13px;
+        min-width: 35px;
+        text-align: center;
+    }
+    input[type="range"] {
+        width: 120px;
+        height: 6px;
+        background: var(--bg-tertiary);
+        border-radius: 5px;
+        outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        background: var(--accent-primary);
+        cursor: pointer;
+        border-radius: 50%;
+    }
+    input[type="range"]::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        background: var(--accent-primary);
+        cursor: pointer;
+        border-radius: 50%;
+        border: none;
+    }
+    input[type="number"] {
+        width: 60px;
+        padding: 4px;
+        background: var(--bg-primary);
+        border: 2px solid var(--border-color);
+        color: var(--text-primary);
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    input[type="number"]:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+    }
+    select {
+        padding: 6px 10px;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        border-radius: 5px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+    select:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+    }
+    .mode-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    .mode-btn {
+        padding: 6px 16px;
+        border: 1px solid var(--accent-primary);
+        background: var(--bg-tertiary);
+        color: var(--accent-primary);
+        cursor: pointer;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 13px;
+        transition: all 0.3s;
+    }
+    .mode-btn.active {
+        background: var(--accent-primary);
+        color: var(--bg-primary);
+    }
+    .mode-btn:hover {
+        background: var(--accent-hover);
+        color: var(--bg-primary);
+        border-color: var(--accent-hover);
+    }
+    .input-group {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+    .input-label {
+        color: var(--text-primary);
+        font-weight: bold;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+    .top-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin-top: 0;
+        margin-bottom: 20px;
+        justify-items: center;
+    }
+    .method-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        justify-items: center;
+    }
+    .image-container {
+        text-align: center;
+        background: var(--bg-secondary);
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 8px var(--shadow-color);
+        transition: all 0.3s;
+    }
+    .image-container:hover {
+        border-color: var(--border-hover);
+    }
+    .image-container canvas {
+        width: 220px !important;
+        height: 220px !important;
+        display: block;
+        margin: 0 auto;
+        border: 3px solid #ffffff;
+        border-radius: 5px;
+    }
+    /* Ensure the heading above the small image canvases is centered with the image */
+    .image-container > h2 {
+        width: 220px;
+        margin: 0 auto 8px;
+        text-align: center;
+        font-size: 16px;
+        color: var(--text-secondary);
+    }
+    .top-row .image-container canvas {
+        width: 220px !important;
+        height: 220px !important;
+    }
+    .image-container.input {
+        border: 1px solid var(--border-color);
+    }
+    .image-container.gt {
+        border: 1px solid var(--border-color);
+    }
+    .image-container img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+        border-radius: 5px;
+    }
+    .image-title {
+        font-weight: bold;
+        margin-top: 8px;
+        font-size: 18px;
+        color: var(--text-secondary);
+    }
+    .image-title.resmatching {
+        color: var(--accent-primary);
+        font-weight: 600;
+    }
+    #inputCanvas {
+        border: 3px solid #ffffff;
+        cursor: crosshair;
+        border-radius: 5px;
+        box-shadow: 0 2px 8px var(--shadow-color);
+        max-width: 100%;
+        height: auto;
+    }
+    #gtCanvas {
+        border: 3px solid #ffffff;
+        border-radius: 5px;
+        box-shadow: 0 2px 8px var(--shadow-color);
+        max-width: 100%;
+        height: auto;
+        cursor: crosshair;
+    }
+    #gtCropCanvas {
+        border: 3px solid #ffffff;
+        border-radius: 5px;
+        box-shadow: 0 2px 8px var(--shadow-color);
+    }
+    canvas {
+        image-rendering: pixelated;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: crisp-edges;
+    }
+    h2 {
+        color: var(--text-primary);
+        text-align: center;
+        margin-bottom: 8px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+</style>
+
+<!-- Paper Header -->
+<div class="paper-header">
+    <h1 class="paper-title">ResMatching: Noise-Resilient Computational Super-Resolution via Guided Conditional Flow Matching</h1>
+
+    <div class="authors">
+        <a href="https://rayanirban.github.io/" class="author-link">Anirban Ray</a><sup>1,2</sup>,
+        <a href="https://humantechnopole.it/en/people/vera-galinova/" class="author-link">Vera Galinova</a><sup>1</sup>,
+        <a href="https://humantechnopole.it/en/people/florian-jug/" class="author-link">Florian Jug</a><sup>1</sup>
+    </div>
+
+    <div class="affiliations">
+        <sup>1</sup>Human Technopole, Milan, Italy<br>
+        <sup>2</sup>Technische Universität Dresden, Germany
+    </div>
+
+    <div class="paper-links">
+        <a href="https://arxiv.org/abs/2510.26601" class="paper-link" target="_blank">
+            <svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            arXiv
+        </a>
+        <a href="https://github.com/yourusername/resmatching" class="paper-link" target="_blank">
+            <svg width="20" height="20" viewbox="0 0 24 24" fill="currentColor">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+            </svg>
+            GitHub
+        </a>
+    </div>
+</div>
+
+<!-- Paper Summary -->
+<div class="paper-summary">
+    <h3 class="anchored">Abstract</h3>
+    <p>
+        Computational Super-Resolution (CSR) in fluorescence microscopy aims to recover unobserved spatial frequencies by leveraging strong image priors. We introduce ResMatching, a guided conditional flow-matching framework that learns improved data-priors for CSR. Evaluated on four BioSR structures against seven baselines, ResMatching consistently achieves the best trade-off between fidelity and perceptual realism, especially under high noise. Moreover, it enables calibrated posterior sampling, providing pixel-wise uncertainty maps to identify unreliable predictions.
+    </p>
+    <p>
+        <strong>Key contributions:</strong> (1) A flow-matching framework for noise-resilient super-resolution, 
+        (2) Superior performance on diverse microscopy imaging tasks, (3) Efficient sampling from learned distributions 
+        for uncertainty calibration.
+    </p>
+</div>
+
+<!-- Results Section -->
+<div class="results-section">
+    <h2 class="anchored">Results</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="plots_website.png" alt="Distortion and Perception Performance" style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border-color);">
+    </div>
+</div>
+
+<!-- Section Divider -->
+<div class="section-divider"></div>
+
+<!-- Interactive Viewer Section -->
+<div class="interactive-section">
+    <h2 style="color: var(--text-primary); text-align: center; margin-bottom: 30px; font-size: 2rem; font-weight: 600;" class="anchored">Interactive Comparison Tool</h2>
+    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
+        Explore our results interactively. Select different datasets and image IDs, adjust crop regions, and compare ResMatching 
+        with baseline methods using the curtain tool below.
+    </p>
+
+<div class="controls">
+    <div class="control-row">
+        <span class="control-label">Dataset:</span>
+        <select id="datasetSelect">
+            <option value="MTNOISY" selected="">MTNOISY</option><option value="ER">ER</option><option value="CCP">CCP</option><option value="FACTIN">FACTIN</option>
+        </select>
+    </div>
+    <div class="control-row">
+        <span class="control-label">Image ID:</span>
+        <select id="imageIdSelect">
+            <option value="2" selected="">Image 2</option><option value="4">Image 4</option>
+        </select>
+    </div>
+    <div class="control-row">
+        <span class="control-label">Mode:</span>
+        <div class="mode-buttons">
+            <button class="mode-btn active" onclick="setMode('sample')">Sample</button>
+            <button class="mode-btn" onclick="setMode('mmse')">MMSE</button>
+        </div>
+    </div>
+    <div class="control-row">
+        <span class="control-label">Crop Size:</span>
+        <input type="range" id="cropSize" min="64" max="512" step="16" value="128">
+        <span class="slider-value" id="cropSizeValue">128</span>
+    </div>
+    <div class="control-row">
+        <span class="control-label">Position:</span>
+        <div class="input-group">
+            <span class="input-label">X:</span>
+            <input type="number" id="startXInput" min="0" max="876" value="438">
+            <span class="input-label">Y:</span>
+            <input type="number" id="startYInput" min="0" max="876" value="438">
+        </div>
+    </div>
+</div>
+
+<h2 style="color: var(--text-primary); margin-top: 20px; font-weight: 600;" class="anchored">Image Comparison</h2>
+
+<div class="top-row">
+    <div class="image-container input">
+        <h2 style="color: var(--text-secondary);" class="anchored">Input Frame</h2>
+        <canvas id="inputCanvas" width="1004" height="1004"></canvas>
+        <div class="image-title">Click and drag </div>
+    </div>
+    <div class="image-container input">
+        <h2 style="color: var(--text-secondary);" class="anchored">Input Crop</h2>
+        <canvas id="inputCropCanvas" width="256" height="256"></canvas>
+        <div class="image-title">Cropped Input Region</div>
+    </div>
+    <div class="image-container gt">
+        <h2 style="color: var(--text-secondary);" class="anchored">Ground Truth</h2>
+        <canvas id="gtCanvas" width="1004" height="1004"></canvas>
+        <div class="image-title">Full GT Image</div>
+    </div>
+    <div class="image-container gt">
+        <h2 style="color: var(--text-secondary);" class="anchored">GT Crop</h2>
+        <canvas id="gtCropCanvas" width="256" height="256"></canvas>
+        <div class="image-title">Cropped GT Region</div>
+    </div>
+</div>
+
+<h2 style="color: var(--text-primary); font-weight: 600;" class="anchored">Predictions</h2>
+
+<div class="method-grid" id="methodGrid">
+    <!-- Method images will be inserted here -->
+</div>
+
+<script>
+// Image data - all datasets and image IDs
+const allImagesData = {"MTNOISY": {"2": {"Input": {"data": "image_data/MTNOISY_2_Input.png", "shape": [1004, 1004], "color": "red", "display_name": "Input"}, "GT": {"data": "image_data/MTNOISY_2_GT.png", "shape": [1004, 1004], "color": "green", "display_name": "GT"}, "UNet": {"data": "image_data/MTNOISY_2_UNet.png", "shape": [1004, 1004], "color": "black", "display_name": "UNet"}, "RCAN": {"data": "image_data/MTNOISY_2_RCAN.png", "shape": [1004, 1004], "color": "black", "display_name": "RCAN"}, "ESRGAN": {"data": "image_data/MTNOISY_2_ESRGAN.png", "shape": [1004, 1004], "color": "black", "display_name": "ESRGAN"}, "InDI/01": {"data": "image_data/MTNOISY_2_InDI_01.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/01"}, "InDI/20": {"data": "image_data/MTNOISY_2_InDI_20.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/20"}, "HVAE_sample": {"data": "image_data/MTNOISY_2_HVAE_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "HVAE_mmse": {"data": "image_data/MTNOISY_2_HVAE_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "SIFM_sample": {"data": "image_data/MTNOISY_2_SIFM_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "SIFM_mmse": {"data": "image_data/MTNOISY_2_SIFM_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "ResMatching_sample": {"data": "image_data/MTNOISY_2_ResMatching_sample.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}, "ResMatching_mmse": {"data": "image_data/MTNOISY_2_ResMatching_mmse.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}}, "4": {"Input": {"data": "image_data/MTNOISY_4_Input.png", "shape": [1004, 1004], "color": "red", "display_name": "Input"}, "GT": {"data": "image_data/MTNOISY_4_GT.png", "shape": [1004, 1004], "color": "green", "display_name": "GT"}, "UNet": {"data": "image_data/MTNOISY_4_UNet.png", "shape": [1004, 1004], "color": "black", "display_name": "UNet"}, "RCAN": {"data": "image_data/MTNOISY_4_RCAN.png", "shape": [1004, 1004], "color": "black", "display_name": "RCAN"}, "ESRGAN": {"data": "image_data/MTNOISY_4_ESRGAN.png", "shape": [1004, 1004], "color": "black", "display_name": "ESRGAN"}, "InDI/01": {"data": "image_data/MTNOISY_4_InDI_01.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/01"}, "InDI/20": {"data": "image_data/MTNOISY_4_InDI_20.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/20"}, "HVAE_sample": {"data": "image_data/MTNOISY_4_HVAE_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "HVAE_mmse": {"data": "image_data/MTNOISY_4_HVAE_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "SIFM_sample": {"data": "image_data/MTNOISY_4_SIFM_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "SIFM_mmse": {"data": "image_data/MTNOISY_4_SIFM_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "ResMatching_sample": {"data": "image_data/MTNOISY_4_ResMatching_sample.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}, "ResMatching_mmse": {"data": "image_data/MTNOISY_4_ResMatching_mmse.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}}}, "ER": {"1": {"Input": {"data": "image_data/ER_1_Input.png", "shape": [1004, 1004], "color": "red", "display_name": "Input"}, "GT": {"data": "image_data/ER_1_GT.png", "shape": [1004, 1004], "color": "green", "display_name": "GT"}, "UNet": {"data": "image_data/ER_1_UNet.png", "shape": [1004, 1004], "color": "black", "display_name": "UNet"}, "RCAN": {"data": "image_data/ER_1_RCAN.png", "shape": [1004, 1004], "color": "black", "display_name": "RCAN"}, "ESRGAN": {"data": "image_data/ER_1_ESRGAN.png", "shape": [1004, 1004], "color": "black", "display_name": "ESRGAN"}, "InDI/01": {"data": "image_data/ER_1_InDI_01.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/01"}, "InDI/20": {"data": "image_data/ER_1_InDI_20.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/20"}, "HVAE_sample": {"data": "image_data/ER_1_HVAE_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "HVAE_mmse": {"data": "image_data/ER_1_HVAE_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "SIFM_sample": {"data": "image_data/ER_1_SIFM_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "SIFM_mmse": {"data": "image_data/ER_1_SIFM_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "ResMatching_sample": {"data": "image_data/ER_1_ResMatching_sample.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}, "ResMatching_mmse": {"data": "image_data/ER_1_ResMatching_mmse.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}}, "8": {"Input": {"data": "image_data/ER_8_Input.png", "shape": [1004, 1004], "color": "red", "display_name": "Input"}, "GT": {"data": "image_data/ER_8_GT.png", "shape": [1004, 1004], "color": "green", "display_name": "GT"}, "UNet": {"data": "image_data/ER_8_UNet.png", "shape": [1004, 1004], "color": "black", "display_name": "UNet"}, "RCAN": {"data": "image_data/ER_8_RCAN.png", "shape": [1004, 1004], "color": "black", "display_name": "RCAN"}, "ESRGAN": {"data": "image_data/ER_8_ESRGAN.png", "shape": [1004, 1004], "color": "black", "display_name": "ESRGAN"}, "InDI/01": {"data": "image_data/ER_8_InDI_01.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/01"}, "InDI/20": {"data": "image_data/ER_8_InDI_20.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/20"}, "HVAE_sample": {"data": "image_data/ER_8_HVAE_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "HVAE_mmse": {"data": "image_data/ER_8_HVAE_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "SIFM_sample": {"data": "image_data/ER_8_SIFM_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "SIFM_mmse": {"data": "image_data/ER_8_SIFM_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "ResMatching_sample": {"data": "image_data/ER_8_ResMatching_sample.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}, "ResMatching_mmse": {"data": "image_data/ER_8_ResMatching_mmse.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}}}, "CCP": {"2": {"Input": {"data": "image_data/CCP_2_Input.png", "shape": [1004, 1004], "color": "red", "display_name": "Input"}, "GT": {"data": "image_data/CCP_2_GT.png", "shape": [1004, 1004], "color": "green", "display_name": "GT"}, "UNet": {"data": "image_data/CCP_2_UNet.png", "shape": [1004, 1004], "color": "black", "display_name": "UNet"}, "RCAN": {"data": "image_data/CCP_2_RCAN.png", "shape": [1004, 1004], "color": "black", "display_name": "RCAN"}, "ESRGAN": {"data": "image_data/CCP_2_ESRGAN.png", "shape": [1004, 1004], "color": "black", "display_name": "ESRGAN"}, "InDI/01": {"data": "image_data/CCP_2_InDI_01.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/01"}, "InDI/20": {"data": "image_data/CCP_2_InDI_20.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/20"}, "HVAE_sample": {"data": "image_data/CCP_2_HVAE_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "HVAE_mmse": {"data": "image_data/CCP_2_HVAE_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "SIFM_sample": {"data": "image_data/CCP_2_SIFM_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "SIFM_mmse": {"data": "image_data/CCP_2_SIFM_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "ResMatching_sample": {"data": "image_data/CCP_2_ResMatching_sample.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}, "ResMatching_mmse": {"data": "image_data/CCP_2_ResMatching_mmse.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}}, "6": {"Input": {"data": "image_data/CCP_6_Input.png", "shape": [1004, 1004], "color": "red", "display_name": "Input"}, "GT": {"data": "image_data/CCP_6_GT.png", "shape": [1004, 1004], "color": "green", "display_name": "GT"}, "UNet": {"data": "image_data/CCP_6_UNet.png", "shape": [1004, 1004], "color": "black", "display_name": "UNet"}, "RCAN": {"data": "image_data/CCP_6_RCAN.png", "shape": [1004, 1004], "color": "black", "display_name": "RCAN"}, "ESRGAN": {"data": "image_data/CCP_6_ESRGAN.png", "shape": [1004, 1004], "color": "black", "display_name": "ESRGAN"}, "InDI/01": {"data": "image_data/CCP_6_InDI_01.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/01"}, "InDI/20": {"data": "image_data/CCP_6_InDI_20.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/20"}, "HVAE_sample": {"data": "image_data/CCP_6_HVAE_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "HVAE_mmse": {"data": "image_data/CCP_6_HVAE_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "SIFM_sample": {"data": "image_data/CCP_6_SIFM_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "SIFM_mmse": {"data": "image_data/CCP_6_SIFM_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "ResMatching_sample": {"data": "image_data/CCP_6_ResMatching_sample.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}, "ResMatching_mmse": {"data": "image_data/CCP_6_ResMatching_mmse.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}}}, "FACTIN": {"3": {"Input": {"data": "image_data/FACTIN_3_Input.png", "shape": [1004, 1004], "color": "red", "display_name": "Input"}, "GT": {"data": "image_data/FACTIN_3_GT.png", "shape": [1004, 1004], "color": "green", "display_name": "GT"}, "UNet": {"data": "image_data/FACTIN_3_UNet.png", "shape": [1004, 1004], "color": "black", "display_name": "UNet"}, "RCAN": {"data": "image_data/FACTIN_3_RCAN.png", "shape": [1004, 1004], "color": "black", "display_name": "RCAN"}, "ESRGAN": {"data": "image_data/FACTIN_3_ESRGAN.png", "shape": [1004, 1004], "color": "black", "display_name": "ESRGAN"}, "InDI/01": {"data": "image_data/FACTIN_3_InDI_01.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/01"}, "InDI/20": {"data": "image_data/FACTIN_3_InDI_20.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/20"}, "HVAE_sample": {"data": "image_data/FACTIN_3_HVAE_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "HVAE_mmse": {"data": "image_data/FACTIN_3_HVAE_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "SIFM_sample": {"data": "image_data/FACTIN_3_SIFM_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "SIFM_mmse": {"data": "image_data/FACTIN_3_SIFM_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "ResMatching_sample": {"data": "image_data/FACTIN_3_ResMatching_sample.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}, "ResMatching_mmse": {"data": "image_data/FACTIN_3_ResMatching_mmse.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}}, "9": {"Input": {"data": "image_data/FACTIN_9_Input.png", "shape": [1004, 1004], "color": "red", "display_name": "Input"}, "GT": {"data": "image_data/FACTIN_9_GT.png", "shape": [1004, 1004], "color": "green", "display_name": "GT"}, "UNet": {"data": "image_data/FACTIN_9_UNet.png", "shape": [1004, 1004], "color": "black", "display_name": "UNet"}, "RCAN": {"data": "image_data/FACTIN_9_RCAN.png", "shape": [1004, 1004], "color": "black", "display_name": "RCAN"}, "ESRGAN": {"data": "image_data/FACTIN_9_ESRGAN.png", "shape": [1004, 1004], "color": "black", "display_name": "ESRGAN"}, "InDI/01": {"data": "image_data/FACTIN_9_InDI_01.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/01"}, "InDI/20": {"data": "image_data/FACTIN_9_InDI_20.png", "shape": [1004, 1004], "color": "black", "display_name": "InDI/20"}, "HVAE_sample": {"data": "image_data/FACTIN_9_HVAE_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "HVAE_mmse": {"data": "image_data/FACTIN_9_HVAE_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "HVAE"}, "SIFM_sample": {"data": "image_data/FACTIN_9_SIFM_sample.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "SIFM_mmse": {"data": "image_data/FACTIN_9_SIFM_mmse.png", "shape": [1004, 1004], "color": "black", "display_name": "SIFM"}, "ResMatching_sample": {"data": "image_data/FACTIN_9_ResMatching_sample.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}, "ResMatching_mmse": {"data": "image_data/FACTIN_9_ResMatching_mmse.png", "shape": [1004, 1004], "color": "blue", "display_name": "ResMatching"}}}};
+const availableData = {"MTNOISY": [2, 4], "ER": [1, 8], "CCP": [2, 6], "FACTIN": [3, 9]};
+let currentDataset = 'MTNOISY';
+let currentImageId = '2';
+let imagesData = allImagesData[currentDataset][currentImageId];
+let imgWidth = imagesData['Input'].shape ? imagesData['Input'].shape[1] : 1004;
+let imgHeight = imagesData['Input'].shape ? imagesData['Input'].shape[0] : 1004;
+
+// Method order for display (excluding GT since it's in top row)
+// Matches the order in method_config
+const methodOrder = ['UNet', 'RCAN', 'ESRGAN', 'InDI/01', 'InDI/20', 'HVAE', 'SIFM', 'ResMatching'];
+
+// State
+let currentMode = 'sample';
+let cropSize = 128;
+let startX = 438;
+let startY = 438;
+let isDragging = false;
+let dragStartX, dragStartY;
+let updatePending = false;
+
+// Canvas setup
+const canvas = document.getElementById('inputCanvas');
+const ctx = canvas.getContext('2d');
+const inputCropCanvas = document.getElementById('inputCropCanvas');
+const inputCropCtx = inputCropCanvas.getContext('2d');
+const gtCanvas = document.getElementById('gtCanvas');
+const gtCtx = gtCanvas.getContext('2d');
+const gtCropCanvas = document.getElementById('gtCropCanvas');
+const gtCropCtx = gtCropCanvas.getContext('2d');
+
+const inputImage = new Image();
+const gtImage = new Image();
+
+let imagesLoaded = 0;
+
+function checkImagesLoaded() {
+    imagesLoaded++;
+    if (imagesLoaded === 2) {
+        updateDisplay();
+    }
+}
+
+inputImage.onload = checkImagesLoaded;
+gtImage.onload = checkImagesLoaded;
+
+inputImage.src = imagesData['Input'].data;
+gtImage.src = imagesData['GT'].data;
+
+// Update sliders and inputs
+function updateSliders() {
+    document.getElementById('cropSize').value = cropSize;
+    document.getElementById('cropSizeValue').textContent = cropSize;
+    document.getElementById('startXInput').value = startX;
+    document.getElementById('startYInput').value = startY;
+
+    // Update max values for number inputs
+    document.getElementById('startXInput').max = imgWidth - cropSize;
+    document.getElementById('startYInput').max = imgHeight - cropSize;
+}
+
+// Draw input image with crop box
+function drawInputCanvas() {
+    ctx.drawImage(inputImage, 0, 0);
+
+    // Draw crop rectangle with thick, bright yellow border
+    ctx.strokeStyle = '#FFFF00';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(startX, startY, cropSize, cropSize);
+
+    // Add outer glow effect
+    ctx.strokeStyle = 'rgba(255, 255, 0, 0.5)';
+    ctx.lineWidth = 8;
+    ctx.strokeRect(startX - 1.5, startY - 1.5, cropSize + 3, cropSize + 3);
+}
+
+// Draw GT image with crop box
+function drawGTCanvas() {
+    gtCtx.drawImage(gtImage, 0, 0);
+
+    // Draw crop rectangle with thick, bright yellow border
+    gtCtx.strokeStyle = '#FFFF00';
+    gtCtx.lineWidth = 5;
+    gtCtx.strokeRect(startX, startY, cropSize, cropSize);
+
+    // Add outer glow effect
+    gtCtx.strokeStyle = 'rgba(255, 255, 0, 0.5)';
+    gtCtx.lineWidth = 8;
+    gtCtx.strokeRect(startX - 1.5, startY - 1.5, cropSize + 3, cropSize + 3);
+}
+
+// Draw GT crop
+function drawGTCrop() {
+    // Scale to show larger crop
+    const scale = 256 / cropSize;
+    gtCropCtx.clearRect(0, 0, 256, 256);
+    gtCropCtx.drawImage(gtImage, startX, startY, cropSize, cropSize, 0, 0, 256, 256);
+}
+
+// Draw Input crop
+function drawInputCrop() {
+    // Scale to show larger crop
+    const scale = 256 / cropSize;
+    inputCropCtx.clearRect(0, 0, 256, 256);
+    inputCropCtx.drawImage(inputImage, startX, startY, cropSize, cropSize, 0, 0, 256, 256);
+}
+
+// Update method grid
+function updateMethodGrid() {
+    const grid = document.getElementById('methodGrid');
+    grid.innerHTML = '';
+
+    methodOrder.forEach(methodName => {
+        let key = methodName;
+
+        // Handle stochastic methods with mode switching
+        if (['ResMatching', 'SIFM', 'HVAE'].includes(methodName)) {
+            key = `${methodName}_${currentMode}`;
+        }
+
+        if (!imagesData[key]) return;
+
+        const container = document.createElement('div');
+        container.className = 'image-container';
+        container.id = `method-${methodName.replace('/', '_')}`;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 256;
+
+        const img = new Image();
+        img.onload = function() {
+            const ctx = canvas.getContext('2d');
+            const scale = 256 / cropSize;
+            ctx.drawImage(img, startX, startY, cropSize, cropSize, 0, 0, 256, 256);
+        };
+        img.src = imagesData[key].data;
+
+        const title = document.createElement('div');
+        title.className = 'image-title';
+
+        // Apply special styling for ResMatching
+        if (methodName === 'ResMatching') {
+            title.classList.add('resmatching');
+        }
+
+        // Set display name with proper formatting
+        let displayName = imagesData[key].display_name;
+        if (methodName === 'SIFM') {
+            title.innerHTML = 'SIFM<sub>σ<sub>1.0|1.0</sub></sub>';
+        } else if (methodName === 'InDI/01') {
+            title.innerHTML = 'InDI<sub>1</sub>';
+        } else if (methodName === 'InDI/20') {
+            title.innerHTML = 'InDI<sub>20</sub>';
+        } else {
+            title.textContent = displayName;
+        }
+
+        container.appendChild(canvas);
+        container.appendChild(title);
+        grid.appendChild(container);
+    });
+}
+
+// Update entire display
+function updateDisplay() {
+    if (updatePending) return;
+    updatePending = true;
+
+    requestAnimationFrame(() => {
+        drawInputCanvas();
+        drawInputCrop();
+        drawGTCanvas();
+        drawGTCrop();
+        updateMethodGrid();
+        updatePending = false;
+    });
+}
+
+// Mode switching
+function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    updateDisplay();
+}
+
+// Slider event listeners
+document.getElementById('cropSize').addEventListener('input', function(e) {
+    cropSize = parseInt(e.target.value);
+
+    // Constrain position if needed
+    startX = Math.min(startX, imgWidth - cropSize);
+    startY = Math.min(startY, imgHeight - cropSize);
+
+    updateSliders();
+
+    // Throttle updates during sliding
+    if (!updatePending) {
+        updateDisplay();
+    }
+});
+
+// Number input event listeners with validation
+document.getElementById('startXInput').addEventListener('change', function(e) {
+    let val = parseInt(e.target.value);
+    if (isNaN(val)) val = 0;
+    startX = Math.max(0, Math.min(imgWidth - cropSize, val));
+    updateSliders();
+    updateDisplay();
+});
+
+document.getElementById('startYInput').addEventListener('change', function(e) {
+    let val = parseInt(e.target.value);
+    if (isNaN(val)) val = 0;
+    startY = Math.max(0, Math.min(imgHeight - cropSize, val));
+    updateSliders();
+    updateDisplay();
+});
+
+// Dataset selection event listener
+document.getElementById('datasetSelect').addEventListener('change', function(e) {
+    const selectedDataset = e.target.value;
+    if (!availableData[selectedDataset]) {
+        alert(`Dataset ${selectedDataset} not available.`);
+        e.target.value = currentDataset;
+        return;
+    }
+
+    currentDataset = selectedDataset;
+
+    // Update image ID dropdown with available IDs for this dataset
+    const imageIdSelect = document.getElementById('imageIdSelect');
+    imageIdSelect.innerHTML = '';
+    const availableIds = availableData[currentDataset];
+    availableIds.forEach(id => {
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = `Image ${id}`;
+        imageIdSelect.appendChild(option);
+    });
+
+    // Set first available image ID
+    currentImageId = String(availableIds[0]);
+    imageIdSelect.value = currentImageId;
+
+    // Switch to new dataset/image
+    switchDatasetImage(currentDataset, currentImageId);
+});
+
+// Image ID selection event listener
+document.getElementById('imageIdSelect').addEventListener('change', function(e) {
+    const selectedId = e.target.value;
+    if (!allImagesData[currentDataset] || !allImagesData[currentDataset][selectedId]) {
+        alert(`Image ID ${selectedId} not available in ${currentDataset} dataset.`);
+        e.target.value = currentImageId;
+        return;
+    }
+
+    currentImageId = selectedId;
+    switchDatasetImage(currentDataset, currentImageId);
+});
+
+function switchDatasetImage(dataset, imageId) {
+    // Update global imagesData reference
+    imagesData = allImagesData[dataset][imageId];
+
+    // Update image dimensions
+    if (imagesData['Input'] && imagesData['Input'].shape) {
+        imgWidth = imagesData['Input'].shape[1];
+        imgHeight = imagesData['Input'].shape[0];
+    }
+
+    // Update input constraints
+    document.getElementById('startXInput').max = imgWidth - cropSize;
+    document.getElementById('startYInput').max = imgHeight - cropSize;
+
+    // Constrain position if needed
+    startX = Math.min(startX, imgWidth - cropSize);
+    startY = Math.min(startY, imgHeight - cropSize);
+
+    // Reload images
+    inputImage.src = imagesData['Input'].data;
+    gtImage.src = imagesData['GT'].data;
+
+    // Reset counters and wait for images to load
+    imagesLoaded = 0;
+
+    // Also update curtain images
+    curtainInputImage.src = imagesData['Input'].data;
+    curtainImagesLoaded = 1; // Reset, wait for compare image
+    updateCurtainMethod();
+}
+
+// Mouse interaction on input canvas
+canvas.addEventListener('mousedown', function(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
+
+    // Check if click is inside crop box
+    if (mouseX >= startX && mouseX <= startX + cropSize &&
+        mouseY >= startY && mouseY <= startY + cropSize) {
+        isDragging = true;
+        dragStartX = mouseX - startX;
+        dragStartY = mouseY - startY;
+        canvas.style.cursor = 'grabbing';
+    }
+});
+
+canvas.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
+
+    startX = Math.max(0, Math.min(imgWidth - cropSize, mouseX - dragStartX));
+    startY = Math.max(0, Math.min(imgHeight - cropSize, mouseY - dragStartY));
+
+    updateSliders();
+
+    // Throttle updates during dragging
+    if (!updatePending) {
+        updateDisplay();
+    }
+});
+
+canvas.addEventListener('mouseup', function() {
+    isDragging = false;
+    canvas.style.cursor = 'crosshair';
+});
+
+canvas.addEventListener('mouseleave', function() {
+    isDragging = false;
+    canvas.style.cursor = 'crosshair';
+});
+
+// Mouse interaction on GT canvas (same functionality)
+gtCanvas.addEventListener('mousedown', function(e) {
+    const rect = gtCanvas.getBoundingClientRect();
+    const scaleX = gtCanvas.width / rect.width;
+    const scaleY = gtCanvas.height / rect.height;
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
+
+    // Check if click is inside crop box
+    if (mouseX >= startX && mouseX <= startX + cropSize &&
+        mouseY >= startY && mouseY <= startY + cropSize) {
+        isDragging = true;
+        dragStartX = mouseX - startX;
+        dragStartY = mouseY - startY;
+        gtCanvas.style.cursor = 'grabbing';
+    }
+});
+
+gtCanvas.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+
+    const rect = gtCanvas.getBoundingClientRect();
+    const scaleX = gtCanvas.width / rect.width;
+    const scaleY = gtCanvas.height / rect.height;
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
+
+    startX = Math.max(0, Math.min(imgWidth - cropSize, mouseX - dragStartX));
+    startY = Math.max(0, Math.min(imgHeight - cropSize, mouseY - dragStartY));
+
+    updateSliders();
+
+    // Throttle updates during dragging
+    if (!updatePending) {
+        updateDisplay();
+    }
+});
+
+gtCanvas.addEventListener('mouseup', function() {
+    isDragging = false;
+    gtCanvas.style.cursor = 'crosshair';
+});
+
+gtCanvas.addEventListener('mouseleave', function() {
+    isDragging = false;
+    gtCanvas.style.cursor = 'crosshair';
+});
+
+// Initialize
+updateSliders();
+</script>
+
+<h2 style="color: var(--text-primary); margin-top: 40px; font-weight: 600;" class="anchored">Curtain Comparison</h2>
+
+<div class="controls" style="margin-top: 20px;">
+    <div class="control-row">
+        <span class="control-label">Compare Method:</span>
+        <select id="curtainMethodSelect">
+            <option value="GT" selected="">Ground Truth</option>
+            <option value="UNet">UNet</option>
+            <option value="RCAN">RCAN</option>
+            <option value="ESRGAN">ESRGAN</option>
+            <option value="InDI/01">InDI₁</option>
+            <option value="InDI/20">InDI₂₀</option>
+            <option value="HVAE_sample">HVAE (Sample)</option>
+            <option value="HVAE_mmse">HVAE (MMSE)</option>
+            <option value="SIFM_sample">SIFM (Sample)</option>
+            <option value="SIFM_mmse">SIFM (MMSE)</option>
+            <option value="ResMatching_sample">ResMatching (Sample)</option>
+            <option value="ResMatching_mmse">ResMatching (MMSE)</option>
+        </select>
+    </div>
+    <div class="control-row">
+        <span class="control-label">Curtain Position:</span>
+        <input type="range" id="curtainPosition" min="0" max="100" value="50">
+        <span class="slider-value" id="curtainPositionValue">50%</span>
+    </div>
+    <div class="control-row">
+        <span class="control-label">Zoom:</span>
+        <input type="range" id="curtainZoom" min="1" max="4" step="0.1" value="1">
+        <span class="slider-value" id="curtainZoomValue">100%</span>
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 20px;">
+    <div style="display: inline-block; position: relative; max-width: 600px;">
+        <div style="position: relative; display: inline-block;">
+            <canvas id="curtainCanvas" width="1004" height="1004" style="width: 600px !important; height: 600px !important; border: 3px solid #ffffff; border-radius: 5px; cursor: ew-resize; display: block;"></canvas>
+            <div id="curtainLine" style="position: absolute; top: 0; bottom: 0; width: 3px; background: var(--accent-primary); 
+                 box-shadow: 0 0 10px var(--glow-color); cursor: ew-resize; left: 50%; transform: translateX(-50%);"></div>
+            <div style="position: absolute; top: 10px; left: 10px; background: rgba(0, 0, 0, 0.8); padding: 8px 12px; 
+                 border-radius: 5px; color: var(--text-primary); font-weight: bold; font-size: 14px; border: 1px solid var(--border-color);">Input</div>
+            <div id="curtainMethodLabel" style="position: absolute; top: 10px; right: 10px; background: rgba(0, 0, 0, 0.8); 
+                 padding: 8px 12px; border-radius: 5px; color: var(--text-primary); font-weight: bold; font-size: 14px; border: 1px solid var(--border-color);">Ground Truth</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Curtain visualization
+const curtainCanvas = document.getElementById('curtainCanvas');
+const curtainCtx = curtainCanvas.getContext('2d');
+const curtainLine = document.getElementById('curtainLine');
+const curtainMethodLabel = document.getElementById('curtainMethodLabel');
+
+let curtainPosition = 0.5; // 0 to 1
+let curtainMethod = 'GT';
+let curtainDragging = false;
+let curtainUpdatePending = false;
+let curtainCompositeCanvas = null;
+let curtainCompositeCtx = null;
+let curtainZoom = 1.0; // 1.0 = 100%, >1 zoom in
+
+const curtainInputImage = new Image();
+const curtainCompareImage = new Image();
+let curtainImagesLoaded = 0;
+
+function checkCurtainImagesLoaded() {
+    curtainImagesLoaded++;
+    if (curtainImagesLoaded === 2) {
+        drawCurtain();
+    }
+}
+
+curtainInputImage.onload = checkCurtainImagesLoaded;
+curtainCompareImage.onload = checkCurtainImagesLoaded;
+
+curtainInputImage.src = imagesData['Input'].data;
+
+function createCurtainComposite() {
+    // Create a composite canvas for faster drawing during drag
+    if (!curtainCompositeCanvas) {
+        curtainCompositeCanvas = document.createElement('canvas');
+        curtainCompositeCanvas.width = curtainCanvas.width;
+        curtainCompositeCanvas.height = curtainCanvas.height;
+        curtainCompositeCtx = curtainCompositeCanvas.getContext('2d');
+    }
+
+    // Draw both images onto composite
+    curtainCompositeCtx.clearRect(0, 0, curtainCompositeCanvas.width, curtainCompositeCanvas.height);
+
+    // Compute source rect for zoom (centered)
+    const srcW = Math.max(1, Math.floor(curtainCompareImage.width / curtainZoom));
+    const srcH = Math.max(1, Math.floor(curtainCompareImage.height / curtainZoom));
+    const srcX = Math.max(0, Math.floor((curtainCompareImage.width - srcW) / 2));
+    const srcY = Math.max(0, Math.floor((curtainCompareImage.height - srcH) / 2));
+
+    curtainCompositeCtx.drawImage(curtainCompareImage, srcX, srcY, srcW, srcH, 0, 0, curtainCompositeCanvas.width, curtainCompositeCanvas.height);
+}
+
+function updateCurtainMethod() {
+    curtainImagesLoaded = 1; // Reset to wait for compare image only
+
+    let key = curtainMethod;
+
+    if (!imagesData[key]) {
+        console.error('Method not found:', key);
+        return;
+    }
+
+    curtainCompareImage.onload = function() {
+        createCurtainComposite();
+        drawCurtain();
+    };
+    curtainCompareImage.src = imagesData[key].data;
+
+    // Update label with proper formatting
+    const methodLabels = {
+        'GT': 'Ground Truth',
+        'UNet': 'UNet',
+        'RCAN': 'RCAN',
+        'ESRGAN': 'ESRGAN',
+        'InDI/01': 'InDI<sub>1</sub>',
+        'InDI/20': 'InDI<sub>20</sub>',
+        'HVAE_sample': 'HVAE (Sample)',
+        'HVAE_mmse': 'HVAE (MMSE)',
+        'SIFM_sample': 'SIFM<sub>σ<sub>1.0|1.0</sub></sub> (Sample)',
+        'SIFM_mmse': 'SIFM<sub>σ<sub>1.0|1.0</sub></sub> (MMSE)',
+        'ResMatching_sample': 'ResMatching (Sample)',
+        'ResMatching_mmse': 'ResMatching (MMSE)'
+    };
+    curtainMethodLabel.innerHTML = methodLabels[curtainMethod] || curtainMethod;
+}
+
+function drawCurtain() {
+    const splitX = curtainCanvas.width * curtainPosition;
+
+    // Compute source rect for zoom (centered)
+    const srcW = Math.max(1, Math.floor(curtainCompareImage.width / curtainZoom));
+    const srcH = Math.max(1, Math.floor(curtainCompareImage.height / curtainZoom));
+    const srcX = Math.max(0, Math.floor((curtainCompareImage.width - srcW) / 2));
+    const srcY = Math.max(0, Math.floor((curtainCompareImage.height - srcH) / 2));
+
+    // Clear and draw comparison image from composite (already zoomed) or directly
+    curtainCtx.clearRect(0, 0, curtainCanvas.width, curtainCanvas.height);
+
+    if (curtainCompositeCanvas) {
+        curtainCtx.drawImage(curtainCompositeCanvas, 0, 0);
+    } else {
+        curtainCtx.drawImage(curtainCompareImage, srcX, srcY, srcW, srcH, 0, 0, curtainCanvas.width, curtainCanvas.height);
+    }
+
+    // Draw input image (left side) - only up to curtain position
+    curtainCtx.save();
+    curtainCtx.beginPath();
+    curtainCtx.rect(0, 0, splitX, curtainCanvas.height);
+    curtainCtx.clip();
+    curtainCtx.drawImage(curtainInputImage, srcX, srcY, srcW, srcH, 0, 0, curtainCanvas.width, curtainCanvas.height);
+    curtainCtx.restore();
+
+    // Update curtain line position
+    updateCurtainLinePosition();
+}
+
+function updateCurtainLinePosition() {
+    const canvasRect = curtainCanvas.getBoundingClientRect();
+    const lineX = (curtainPosition * canvasRect.width);
+    curtainLine.style.left = `${lineX}px`;
+}
+
+function updateCurtainPosition(value) {
+    curtainPosition = value / 100;
+    document.getElementById('curtainPosition').value = value;
+    document.getElementById('curtainPositionValue').textContent = value + '%';
+
+    // Use CSS clip-path for smooth performance during dragging
+    if (curtainDragging) {
+        // Only update line position during drag for smoothness
+        updateCurtainLinePosition();
+
+        // Schedule canvas redraw
+        if (!curtainUpdatePending) {
+            curtainUpdatePending = true;
+            requestAnimationFrame(() => {
+                drawCurtain();
+                curtainUpdatePending = false;
+            });
+        }
+    } else {
+        // Full redraw when not dragging
+        drawCurtain();
+    }
+}
+
+// Event listeners for curtain controls
+document.getElementById('curtainMethodSelect').addEventListener('change', function(e) {
+    curtainMethod = e.target.value;
+    updateCurtainMethod();
+});
+
+document.getElementById('curtainPosition').addEventListener('input', function(e) {
+    updateCurtainPosition(parseInt(e.target.value));
+});
+
+// Initialize zoom label and listener
+document.getElementById('curtainZoomValue').textContent = Math.round(curtainZoom * 100) + '%';
+document.getElementById('curtainZoom').addEventListener('input', function(e) {
+    const val = parseFloat(e.target.value);
+    if (isNaN(val) || val <= 0) return;
+    curtainZoom = val;
+    document.getElementById('curtainZoomValue').textContent = Math.round(curtainZoom * 100) + '%';
+
+    // Recreate composite (uses the new zoom) and redraw
+    createCurtainComposite();
+    drawCurtain();
+});
+
+// Mouse interaction for curtain
+curtainCanvas.addEventListener('mousedown', function(e) {
+    curtainDragging = true;
+});
+
+curtainCanvas.addEventListener('mousemove', function(e) {
+    if (!curtainDragging) return;
+
+    const rect = curtainCanvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const percentage = Math.max(0, Math.min(100, (mouseX / rect.width) * 100));
+    updateCurtainPosition(Math.round(percentage));
+});
+
+curtainCanvas.addEventListener('mouseup', function() {
+    curtainDragging = false;
+});
+
+curtainCanvas.addEventListener('mouseleave', function() {
+    curtainDragging = false;
+});
+
+curtainLine.addEventListener('mousedown', function(e) {
+    e.stopPropagation();
+    curtainDragging = true;
+});
+
+// Initialize curtain
+updateCurtainMethod();
+</script>
+
+<!-- Citation Section -->
+<div class="citation-section">
+    <h2 class="anchored">Citation</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        If you find this work useful in your research, please consider citing:
+    </p>
+    <div class="citation-box">
+        <button class="copy-button" onclick="copyCitation()">Copy</button>
+        <pre id="citationText">@article{resmatching2025,
+  title={ResMatching: Noise-Resilient Computational Super-Resolution via Guided Conditional Flow Matching},
+  author={Anirban Ray and Vera Galinova and Florian Jug},
+  journal={arXiv preprint arXiv:2510.26601},
+  year={2025}
+}</pre>
+    </div>
+</div>
+
+<script>
+function copyCitation() {
+    const citationText = document.getElementById('citationText').textContent;
+    navigator.clipboard.writeText(citationText).then(() => {
+        const button = document.querySelector('.copy-button');
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        button.style.background = 'var(--accent-hover)';
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.style.background = 'var(--accent-primary)';
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy citation:', err);
+        alert('Failed to copy citation. Please copy manually.');
+    });
+}
+</script>
+
+</div>
+</div>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

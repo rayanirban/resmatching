@@ -1,0 +1,13 @@
+# Source files
+*.qmd
+*.ipynb
+ISBI_output_images/
+util/
+*.py
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Temporary files
+*.tiff
